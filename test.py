@@ -24,9 +24,16 @@ def vis_parsing_maps(im, parsing_anno, stride, save_im=False, save_path='vis_res
                    [255, 255, 0], [255, 255, 85], [255, 255, 170],
                    [255, 0, 255], [255, 85, 255], [255, 170, 255],
                    [0, 255, 255], [85, 255, 255], [170, 255, 255]]
-
+    # 0: 'background'	1: 'skin'	2: 'nose'
+    # 3: 'eye_g'	4: 'l_eye'	5: 'r_eye'
+    # 6: 'l_brow'	7: 'r_brow'	8: 'l_ear'
+    # 9: 'r_ear'	10: 'mouth'	11: 'u_lip'
+    # 12: 'l_lip'	13: 'hair'	14: 'hat'
+    # 15: 'ear_r'	16: 'neck_l'	17: 'neck'
+    # 18: 'cloth'	
     im = np.array(im)
     vis_im = im.copy().astype(np.uint8)
+            # glass.jpg: [ 0  1  2  6  7 10 11 12 13 14 16 17]
     vis_parsing_anno = parsing_anno.copy().astype(np.uint8)
     vis_parsing_anno = cv2.resize(vis_parsing_anno, None, fx=stride, fy=stride, interpolation=cv2.INTER_NEAREST)
     vis_parsing_anno_color = np.zeros((vis_parsing_anno.shape[0], vis_parsing_anno.shape[1], 3)) + 255
@@ -74,10 +81,12 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='model_final_diss.pth')
             out = net(img)[0]
             parsing = out.squeeze(0).cpu().numpy().argmax(0)
             # print(parsing)
+            # glass.jpg: [ 0  1  2  6  7 10 11 12 13 14 16 17]
             print(np.unique(parsing))
+            
 
             vis_parsing_maps(image, parsing, stride=1, save_im=True, save_path=osp.join(respth, image_path))
-
+            return parsing
 
 
 
@@ -86,7 +95,7 @@ def evaluate(respth='./res/test_res', dspth='./data', cp='model_final_diss.pth')
 
 if __name__ == "__main__":
     # evaluate(dspth='/home/zll/data/CelebAMask-HQ/test-img', cp='79999_iter.pth')
-    evaluate(dspth='./glass.jpg', cp='79999_iter.pth')
+    evaluate(dspth='./test_img/', cp='79999_iter.pth')
     
 
 
